@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {background-color:#fff;}
+
+.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
+#licensing {
+  fill: white;
+}
+
+.link.licensing {
+  stroke: white;
+}
+
+.link.resolved {
+  stroke-dasharray: 0,2 1;
+}
+
+#resolved grey  fill: red;
+}
+
+.link.resolved {
+  stroke: white;
+}
+
+circle {
+  fill: #800000;
+  stroke: #800000;
+  stroke-width: 1.5px;
+}
+
+text {
+  font: 9px sans-serif;
+  color: aqua;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+// http://blog.thomsonreuters.com/index.php/mobile-patent-suits-graphic-of-the-day/
+var links = [
+
+{source: "North Carolina State"  , target: "Clemson"              ,type: "resolved"},
+{source: "Air Force"             , target: "Wyoming"              ,type: "resolved"},
+{source: "Akron"                 , target: "Louisiana-Lafayette"  ,type: "resolved"},
+{source: "Army"                  , target: "Wake Forest"          ,type: "resolved"},
+{source: "Central Michigan"      , target: "Toledo"               ,type: "resolved"},
+{source: "Connecticut"           , target: "Michigan"             ,type: "resolved"},
+{source: "Duke"                  , target: "Pittsburgh"           ,type: "resolved"},
+{source: "Eastern Michigan"      , target: "Ball State"           ,type: "resolved"},
+{source: "Florida Atlantic"      , target: "Middle Tennessee"     ,type: "resolved"},
+{source: "Indiana"               , target: "Missouri"             ,type: "resolved"},
+{source: "Massachusetts"         , target: "Vanderbilt"           ,type: "resolved"},
+{source: "Memphis"               , target: "Arkansas State"       ,type: "resolved"},
+{source: "Miami (Ohio)"          , target: "Cincinnati"           ,type: "resolved"},
+{source: "San Diego State"       , target: "Oregon State"         ,type: "resolved"},
+{source: "UTEP"                  , target: "UTSA"                 ,type: "resolved"},
+{source: "San Jose State"        , target: "Utah State"           ,type: "resolved"},
+{source: "Arkansas"              , target: "Texas A&M"            ,type: "resolved"},
+{source: "Boston College"        , target: "Florida State"        ,type: "resolved"},
+{source: "Buffalo"               , target: "Connecticut"          ,type: "resolved"},
+{source: "Hawai'i"               , target: "Fresno State"         ,type: "resolved"},
+{source: "Idaho"                 , target: "Temple"               ,type: "resolved"},
+{source: "Kentucky"              , target: "Florida"              ,type: "resolved"},
+{source: "Minnesota"             , target: "Iowa"                 ,type: "resolved"},
+{source: "New Mexico State"      , target: "San Diego State"      ,type: "resolved"},
+{source: "Notre Dame"            , target: "Oklahoma"             ,type: "resolved"},
+{source: "Purdue"                , target: "Northern Illinois"    ,type: "resolved"},
+{source: "South Florida"         , target: "Miami (Florida)"      ,type: "resolved"},
+{source: "Texas State"           , target: "Wyoming"              ,type: "resolved"},
+{source: "UCF"                   , target: "South Carolina"       ,type: "resolved"},
+{source: "West Virginia"         , target: "Oklahoma State"       ,type: "resolved"},
+{source: "Western Kentucky"      , target: "Navy"                 ,type: "resolved"},
+{source: "Western Michigan"      , target: "Kent State"           ,type: "resolved"},
+{source: "Iowa State"            , target: "Texas"                ,type: "resolved"},
+{source: "Louisiana-Monroe"      , target: "Western Kentucky"     ,type: "resolved"},
+{source: "Utah"                  , target: "UCLA"                 ,type: "resolved"},
+{source: "Akron"                 , target: "Ohio"                 ,type: "resolved"},
+{source: "Auburn"                , target: "Mississippi"          ,type: "resolved"},
+{source: "California"            , target: "Washington State"     ,type: "resolved"},
+{source: "Colorado"              , target: "Oregon"               ,type: "resolved"},
+{source: "Hawai'i"               , target: "San Jose State"       ,type: "resolved"},
+{source: "Idaho"                 , target: "Fresno State"         ,type: "resolved"},
+{source: "Indiana"               , target: "Penn State"           ,type: "resolved"},
+{source: "Kansas"                , target: "Texas Tech"           ,type: "resolved"},
+{source: "Kent State"            , target: "Northern Illinois"    ,type: "resolved"},
+{source: "Memphis"               , target: "UCF"                  ,type: "resolved"},
+{source: "Miami (Ohio)"          , target: "Central Michigan"     ,type: "resolved"},
+{source: "Middle Tennessee"      , target: "East Carolina"        ,type: "resolved"},
+{source: "Mississippi State"     , target: "LSU"                  ,type: "resolved"},
+{source: "Northwestern"          , target: "Ohio State"           ,type: "resolved"},
+{source: "SMU"                   , target: "Rutgers"              ,type: "resolved"},
+{source: "South Florida"         , target: "Cincinnati"           ,type: "resolved"},
+{source: "Syracuse"              , target: "Clemson"              ,type: "resolved"},
+{source: "Temple"                , target: "Louisville"           ,type: "resolved"},
+{source: "Tennessee"             , target: "Georgia"              ,type: "resolved"},
+{source: "Tulane"                , target: "North Texas"          ,type: "resolved"},
+{source: "UTEP"                  , target: "Louisiana Tech"       ,type: "resolved"},
+{source: "Vanderbilt"            , target: "Missouri"             ,type: "resolved"},
+{source: "Wake Forest"           , target: "North Carolina State" ,type: "resolved"},
+{source: "Air Force"             , target: "San Diego State"      ,type: "resolved"},
+{source: "Arkansas"              , target: "South Carolina"       ,type: "resolved"},
+{source: "Florida Atlantic"      , target: "Marshall"             ,type: "resolved"},
+{source: "Florida International" , target: "UAB"                  ,type: "resolved"},
+{source: "Georgia State"         , target: "Troy"                 ,type: "resolved"},
+{source: "Kansas State"          , target: "Baylor"               ,type: "resolved"},
+{source: "Kentucky"              , target: "Alabama"              ,type: "resolved"},
+{source: "Mississippi"           , target: "Texas A&M"            ,type: "resolved"},
+{source: "Penn State"            , target: "Michigan"             ,type: "resolved"},
+{source: "Purdue"                , target: "Nebraska"             ,type: "resolved"},
+{source: "UTSA"                  , target: "Rice"                 ,type: "resolved"},
+{source: "Tulane"                , target: "East Carolina"        ,type: "resolved"},
+{source: "UTEP"                  , target: "Tulsa"                ,type: "resolved"},
+{source: "Utah"                  , target: "Stanford"             ,type: "resolved"},
+{source: "Utah State"            , target: "Boise State"          ,type: "resolved"},
+{source: "Washington"            , target: "Oregon"               ,type: "resolved"},
+{source: "Western Michigan"      , target: "Buffalo"              ,type: "resolved"},
+{source: "North Carolina"        , target: "Miami (Florida)"      ,type: "resolved"},
+{source: "California"            , target: "Oregon State"         ,type: "resolved"},
+{source: "Central Michigan"      , target: "Northern Illinois"    ,type: "resolved"},
+{source: "Clemson"               , target: "Florida State"        ,type: "resolved"},
+{source: "Eastern Michigan"      , target: "Ohio"                 ,type: "resolved"},
+{source: "Houston"               , target: "BYU"                  ,type: "resolved"},
+{source: "Illinois"              , target: "Wisconsin"            ,type: "resolved"},
+{source: "Kansas"                , target: "Oklahoma"             ,type: "resolved"},
+{source: "Louisiana Tech"        , target: "North Texas"          ,type: "resolved"},
+{source: "Miami (Ohio)"          , target: "Akron"                ,type: "resolved"},
+{source: "Mississippi"           , target: "LSU"                  ,type: "resolved"},
+{source: "Missouri"              , target: "Florida"              ,type: "resolved"},
+{source: "New Mexico"            , target: "Utah State"           ,type: "resolved"},
+{source: "New Mexico State"      , target: "Rice"                 ,type: "resolved"},
+{source: "Temple"                , target: "Army"                 ,type: "resolved"},
+{source: "Tennessee"             , target: "South Carolina"       ,type: "resolved"},
+{source: "Vanderbilt"            , target: "Georgia"              ,type: "resolved"},
+{source: "Wake Forest"           , target: "Maryland"             ,type: "resolved"},
+{source: "West Virginia"         , target: "Texas Tech"           ,type: "resolved"},
+{source: "Western Michigan"      , target: "Ball State"           ,type: "resolved"},
+{source: "Arkansas State"        , target: "Louisiana-Lafayette"  ,type: "resolved"},
+{source: "Middle Tennessee"      , target: "Marshall"             ,type: "resolved"},
+{source: "Air Force"             , target: "Notre Dame"           ,type: "resolved"},
+{source: "Akron"                 , target: "Ball State"           ,type: "resolved"},
+{source: "Colorado"              , target: "Arizona"              ,type: "resolved"},
+{source: "Florida International" , target: "Louisiana Tech"       ,type: "resolved"},
+{source: "Hawai'i"               , target: "Colorado State"       ,type: "resolved"},
+{source: "Illinois"              , target: "Michigan State"       ,type: "resolved"},
+{source: "Iowa State"            , target: "Oklahoma State"       ,type: "resolved"},
+{source: "Kansas"                , target: "Baylor"               ,type: "resolved"},
+{source: "Kent State"            , target: "Buffalo"              ,type: "resolved"},
+{source: "Maryland"              , target: "Clemson"              ,type: "resolved"},
+{source: "Minnesota"             , target: "Nebraska"             ,type: "resolved"},
+{source: "Navy"                  , target: "Pittsburgh"           ,type: "resolved"},
+{source: "Oregon State"          , target: "Stanford"             ,type: "resolved"},
+{source: "San Diego State"       , target: "Fresno State"         ,type: "resolved"},
+{source: "South Florida"         , target: "Louisville"           ,type: "resolved"},
+{source: "Southern Mississippi"  , target: "North Texas"          ,type: "resolved"},
+{source: "Texas State"           , target: "South Alabama"        ,type: "resolved"},
+{source: "Tulane"                , target: "Tulsa"                ,type: "resolved"},
+{source: "Virginia"              , target: "Georgia Tech"         ,type: "resolved"},
+{source: "Memphis"               , target: "Cincinnati"           ,type: "resolved"},
+{source: "Washington State"      , target: "Arizona State"        ,type: "resolved"},
+{source: "Arkansas"              , target: "Auburn"               ,type: "resolved"},
+{source: "Boston College"        , target: "Virginia Tech"        ,type: "resolved"},
+{source: "California"            , target: "Arizona"              ,type: "resolved"},
+{source: "Colorado State"        , target: "Boise State"          ,type: "resolved"},
+{source: "Florida International" , target: "East Carolina"        ,type: "resolved"},
+{source: "Georgia State"         , target: "Western Kentucky"     ,type: "resolved"},
+{source: "Idaho"                 , target: "Texas State"          ,type: "resolved"},
+{source: "Iowa"                  , target: "Wisconsin"            ,type: "resolved"},
+{source: "Massachusetts"         , target: "Northern Illinois"    ,type: "resolved"},
+{source: "UNLV"                  , target: "San Jose State"       ,type: "resolved"},
+{source: "North Carolina State"  , target: "North Carolina"       ,type: "resolved"},
+{source: "Purdue"                , target: "Ohio State"           ,type: "resolved"},
+{source: "Texas Tech"            , target: "Oklahoma State"       ,type: "resolved"},
+{source: "UAB"                   , target: "Middle Tennessee"     ,type: "resolved"},
+{source: "Virginia"              , target: "Clemson"              ,type: "resolved"},
+{source: "Miami (Ohio)"          , target: "Bowling Green"        ,type: "resolved"},
+{source: "Stanford"              , target: "Oregon"               ,type: "resolved"},
+{source: "Connecticut"           , target: "Louisville"           ,type: "resolved"},
+{source: "Army"                  , target: "Western Kentucky"     ,type: "resolved"},
+{source: "California"            , target: "USC"                  ,type: "resolved"},
+{source: "Eastern Michigan"      , target: "Western Michigan"     ,type: "resolved"},
+{source: "Iowa State"            , target: "TCU"                  ,type: "resolved"},
+{source: "Kentucky"              , target: "Missouri"             ,type: "resolved"},
+{source: "UNLV"                  , target: "Utah State"           ,type: "resolved"},
+{source: "New Mexico State"      , target: "Boston College"       ,type: "resolved"},
+{source: "Pittsburgh"            , target: "Notre Dame"           ,type: "resolved"},
+{source: "Purdue"                , target: "Iowa"                 ,type: "resolved"},
+{source: "Tennessee"             , target: "Auburn"               ,type: "resolved"},
+{source: "Utah"                  , target: "Arizona State"        ,type: "resolved"},
+{source: "Wake Forest"           , target: "Florida State"        ,type: "resolved"},
+{source: "West Virginia"         , target: "Texas"                ,type: "resolved"},
+{source: "Wyoming"               , target: "Fresno State"         ,type: "resolved"},
+{source: "Tulsa"                 , target: "Marshall"             ,type: "resolved"},
+{source: "Duke"                  , target: "Miami (Florida)"      ,type: "resolved"},
+{source: "Georgia State"         , target: "Louisiana-Lafayette"  ,type: "resolved"},
+{source: "Hawai'i"               , target: "San Diego State"      ,type: "resolved"},
+{source: "Illinois"              , target: "Ohio State"           ,type: "resolved"},
+{source: "Kansas"                , target: "West Virginia"        ,type: "resolved"},
+{source: "Massachusetts"         , target: "Akron"                ,type: "resolved"},
+{source: "Mississippi State"     , target: "Alabama"              ,type: "resolved"},
+{source: "Nebraska"              , target: "Michigan State"       ,type: "resolved"},
+{source: "Nevada"                , target: "San Jose State"       ,type: "resolved"},
+{source: "New Mexico"            , target: "Colorado State"       ,type: "resolved"},
+{source: "South Florida"         , target: "Memphis"              ,type: "resolved"},
+{source: "USC"                   , target: "Stanford"             ,type: "resolved"},
+{source: "Southern Mississippi"  , target: "Florida Atlantic"     ,type: "resolved"},
+{source: "Temple"                , target: "UCF"                  ,type: "resolved"},
+{source: "Texas"                 , target: "Oklahoma State"       ,type: "resolved"},
+{source: "Western Michigan"      , target: "Central Michigan"     ,type: "resolved"},
+{source: "Miami (Ohio)"          , target: "Buffalo"              ,type: "resolved"},
+{source: "UAB"                   , target: "Rice"                 ,type: "resolved"},
+{source: "Arizona"               , target: "Oregon"               ,type: "resolved"},
+{source: "Arkansas"              , target: "Mississippi State"    ,type: "resolved"},
+{source: "Colorado"              , target: "USC"                  ,type: "resolved"},
+{source: "Eastern Michigan"      , target: "Bowling Green"        ,type: "resolved"},
+{source: "Florida International" , target: "Marshall"             ,type: "resolved"},
+{source: "Louisiana Tech"        , target: "Tulsa"                ,type: "resolved"},
+{source: "Maryland"              , target: "Boston College"       ,type: "resolved"},
+{source: "Minnesota"             , target: "Wisconsin"            ,type: "resolved"},
+{source: "Mississippi"           , target: "Missouri"             ,type: "resolved"},
+{source: "North Carolina State"  , target: "East Carolina"        ,type: "resolved"},
+{source: "Northwestern"          , target: "Michigan State"       ,type: "resolved"},
+{source: "Oklahoma State"        , target: "Baylor"               ,type: "resolved"},
+{source: "Purdue"                , target: "Illinois"             ,type: "resolved"},
+{source: "San Diego State"       , target: "Boise State"          ,type: "resolved"},
+{source: "South Florida"         , target: "SMU"                  ,type: "resolved"},
+{source: "Southern Mississippi"  , target: "Middle Tennessee"     ,type: "resolved"},
+{source: "Texas State"           , target: "Western Kentucky"     ,type: "resolved"},
+{source: "UCLA"                  , target: "Arizona State"        ,type: "resolved"},
+{source: "Wake Forest"           , target: "Duke"                 ,type: "resolved"},
+{source: "Fresno State"         , target: "Boise State"           , type: "resolved"},
+{source: "Alabama"              , target: "Colorado State"        , type: "resolved"},
+{source: "Baylor"               , target: "Louisiana-Monroe"      , type: "resolved"},
+{source: "BYU"                  , target: "Utah"                  , type: "resolved"},
+{source: "Florida"              , target: "Tennessee"             , type: "resolved"},
+{source: "Georgia"              , target: "North Texas"           , type: "resolved"},
+{source: "Georgia Tech"         , target: "North Carolina"        , type: "resolved"},
+{source: "Iowa"                 , target: "Western Michigan"      , type: "resolved"},
+{source: "Kansas"               , target: "Louisiana Tech"        , type: "resolved"},
+{source: "LSU"                  , target: "Auburn"                , type: "resolved"},
+{source: "Louisville"           , target: "Florida International" , type: "resolved"},
+{source: "Minnesota"            , target: "San Jose State"        , type: "resolved"},
+{source: "Mississippi State"    , target: "Troy"                  , type: "resolved"},
+{source: "Nevada"               , target: "Hawai'i"               , type: "resolved"},
+{source: "Notre Dame"           , target: "Michigan State"        , type: "resolved"},
+{source: "Penn State"           , target: "Kent State"            , type: "resolved"},
+{source: "Rice"                 , target: "Houston"               , type: "resolved"},
+{source: "USC"                  , target: "Utah State"            , type: "resolved"},
+{source: "Stanford"             , target: "Arizona State"         , type: "resolved"},
+{source: "Syracuse"             , target: "Tulane"                , type: "resolved"},
+{source: "Texas"                , target: "Kansas State"          , type: "resolved"},
+{source: "Texas A&M"            , target: "SMU"                   , type: "resolved"},
+{source: "Texas Tech"           , target: "Texas State"           , type: "resolved"},
+{source: "UCLA"                 , target: "New Mexico State"      , type: "resolved"},
+{source: "Virginia Tech"        , target: "Marshall"              , type: "resolved"},
+{source: "Washington State"     , target: "Idaho"                 , type: "resolved"},
+{source: "Wisconsin"            , target: "Purdue"                , type: "resolved"},
+{source: "Georgia Tech"         , target: "Virginia Tech"         , type: "resolved"},
+{source: "Tulsa"                , target: "Iowa State"            , type: "resolved"},
+{source: "BYU"                  , target: "Middle Tennessee"      , type: "resolved"},
+{source: "Alabama"              , target: "Mississippi"           , type: "resolved"},
+{source: "Arizona State"        , target: "USC"                   , type: "resolved"},
+{source: "Ball State"           , target: "Toledo"                , type: "resolved"},
+{source: "Boise State"          , target: "Southern Mississippi"  , type: "resolved"},
+{source: "Bowling Green"        , target: "Akron"                 , type: "resolved"},
+{source: "Clemson"              , target: "Wake Forest"           , type: "resolved"},
+{source: "Colorado State"       , target: "UTEP"                  , type: "resolved"},
+{source: "Duke"                 , target: "Troy"                  , type: "resolved"},
+{source: "Georgia"              , target: "LSU"                   , type: "resolved"},
+{source: "Illinois"             , target: "Miami (Ohio)"          , type: "resolved"},
+{source: "Missouri"             , target: "Arkansas State"        , type: "resolved"},
+{source: "Nevada"               , target: "Air Force"             , type: "resolved"},
+{source: "New Mexico"           , target: "UNLV"                  , type: "resolved"},
+{source: "North Carolina State" , target: "Central Michigan"      , type: "resolved"},
+{source: "North Carolina"       , target: "East Carolina"         , type: "resolved"},
+{source: "Ohio State"           , target: "Wisconsin"             , type: "resolved"},
+{source: "Oregon"               , target: "California"            , type: "resolved"},
+{source: "Oregon State"         , target: "Colorado"              , type: "resolved"},
+{source: "Pittsburgh"           , target: "Virginia"              , type: "resolved"},
+{source: "Rice"                 , target: "Florida Atlantic"      , type: "resolved"},
+{source: "Tennessee"            , target: "South Alabama"         , type: "resolved"},
+{source: "TCU"                  , target: "SMU"                   , type: "resolved"},
+{source: "UTSA"                 , target: "Houston"               , type: "resolved"},
+{source: "Louisiana-Monroe"     , target: "Tulane"                , type: "resolved"},
+{source: "Vanderbilt"           , target: "UAB"                   , type: "resolved"},
+{source: "Washington"           , target: "Arizona"               , type: "resolved"},
+{source: "San Diego State"      , target: "Nevada"                , type: "resolved"},
+{source: "Utah State"           , target: "BYU"                   , type: "resolved"},
+{source: "Alabama"              , target: "Georgia State"         , type: "resolved"},
+{source: "Baylor"               , target: "West Virginia"         , type: "resolved"},
+{source: "Boston College"       , target: "Army"                  , type: "resolved"},
+{source: "Bowling Green"        , target: "Massachusetts"         , type: "resolved"},
+{source: "Buffalo"              , target: "Eastern Michigan"      , type: "resolved"},
+{source: "Florida"              , target: "Arkansas"              , type: "resolved"},
+{source: "Florida State"        , target: "Maryland"              , type: "resolved"},
+{source: "Iowa"                 , target: "Michigan State"        , type: "resolved"},
+{source: "Marshall"             , target: "UTSA"                  , type: "resolved"},
+{source: "Miami (Florida)"      , target: "Georgia Tech"          , type: "resolved"},
+{source: "Michigan"             , target: "Minnesota"             , type: "resolved"},
+{source: "Navy"                 , target: "Air Force"             , type: "resolved"},
+{source: "Nebraska"             , target: "Illinois"              , type: "resolved"},
+{source: "New Mexico"           , target: "New Mexico State"      , type: "resolved"},
+{source: "Oklahoma"             , target: "TCU"                   , type: "resolved"},
+{source: "Oklahoma State"       , target: "Kansas State"          , type: "resolved"},
+{source: "South Carolina"       , target: "Kentucky"              , type: "resolved"},
+{source: "Southern Mississippi" , target: "Florida International" , type: "resolved"},
+{source: "Stanford"             , target: "Washington"            , type: "resolved"},
+{source: "Toledo"               , target: "Western Michigan"      , type: "resolved"},
+{source: "Troy"                 , target: "South Alabama"         , type: "resolved"},
+{source: "Tulsa"                , target: "Rice"                  , type: "resolved"},
+{source: "UAB"                  , target: "Florida Atlantic"      , type: "resolved"},
+{source: "Louisiana-Lafayette"  , target: "Texas State"           , type: "resolved"},
+{source: "Virginia"             , target: "Ball State"            , type: "resolved"},
+{source: "Virginia Tech"        , target: "North Carolina"        , type: "resolved"},
+{source: "Louisville"           , target: "Rutgers"               , type: "resolved"},
+{source: "USC"                  , target: "Arizona"               , type: "resolved"},
+{source: "Cincinnati"           , target: "Temple"                , type: "resolved"},
+{source: "Arizona State"        , target: "Colorado"              , type: "resolved"},
+{source: "Arkansas State"       , target: "Idaho"                 , type: "resolved"},
+{source: "Army"                 , target: "Eastern Michigan"      , type: "resolved"},
+{source: "Ball State"           , target: "Kent State"            , type: "resolved"},
+{source: "BYU"                  , target: "Georgia Tech"          , type: "resolved"},
+{source: "Clemson"              , target: "Boston College"        , type: "resolved"},
+{source: "Colorado State"       , target: "San Jose State"        , type: "resolved"},
+{source: "Connecticut"          , target: "South Florida"         , type: "resolved"},
+{source: "Duke"                 , target: "Navy"                  , type: "resolved"},
+{source: "Georgia"              , target: "Missouri"              , type: "resolved"},
+{source: "Houston"              , target: "Memphis"               , type: "resolved"},
+{source: "LSU"                  , target: "Florida"               , type: "resolved"},
+{source: "Maryland"             , target: "Virginia"              , type: "resolved"},
+{source: "Massachusetts"        , target: "Miami (Ohio)"          , type: "resolved"},
+{source: "Michigan State"       , target: "Indiana"               , type: "resolved"},
+{source: "Mississippi State"    , target: "Bowling Green"         , type: "resolved"},
+{source: "UNLV"                 , target: "Hawai'i"               , type: "resolved"},
+{source: "North Carolina State" , target: "Syracuse"              , type: "resolved"},
+{source: "North Texas"          , target: "Middle Tennessee"      , type: "resolved"},
+{source: "Northern Illinois"    , target: "Akron"                 , type: "resolved"},
+{source: "Ohio"                 , target: "Central Michigan"      , type: "resolved"},
+{source: "TCU"                  , target: "Kansas"                , type: "resolved"},
+{source: "Texas State"          , target: "Louisiana-Monroe"      , type: "resolved"},
+{source: "Texas Tech"           , target: "Iowa State"            , type: "resolved"},
+{source: "UCLA"                 , target: "California"            , type: "resolved"},
+{source: "Virginia Tech"        , target: "Pittsburgh"            , type: "resolved"},
+{source: "Wisconsin"            , target: "Northwestern"          , type: "resolved"},
+{source: "Wyoming"              , target: "New Mexico"            , type: "resolved"},
+{source: "Western Kentucky"     , target: "Louisiana-Lafayette"   , type: "resolved"},
+{source: "Louisville"           , target: "UCF"                   , type: "resolved"},
+{source: "Alabama"              , target: "Arkansas"              , type: "resolved"},
+{source: "Arizona"              , target: "Utah"                  , type: "resolved"},
+{source: "Arizona State"        , target: "Washington"            , type: "resolved"},
+{source: "Baylor"               , target: "Iowa State"            , type: "resolved"},
+{source: "Boise State"          , target: "Nevada"                , type: "resolved"},
+{source: "Buffalo"              , target: "Massachusetts"         , type: "resolved"},
+{source: "Cincinnati"           , target: "Connecticut"           , type: "resolved"},
+{source: "East Carolina"        , target: "Southern Mississippi"  , type: "resolved"},
+{source: "Fresno State"         , target: "UNLV"                  , type: "resolved"},
+{source: "Georgia Tech"         , target: "Syracuse"              , type: "resolved"},
+{source: "Memphis"              , target: "SMU"                   , type: "resolved"},
+{source: "Michigan"             , target: "Indiana"               , type: "resolved"},
+{source: "Michigan State"       , target: "Purdue"                , type: "resolved"},
+{source: "Northwestern"         , target: "Minnesota"             , type: "resolved"},
+{source: "Notre Dame"           , target: "USC"                   , type: "resolved"},
+{source: "Ohio State"           , target: "Iowa"                  , type: "resolved"},
+{source: "Oklahoma State"       , target: "TCU"                   , type: "resolved"},
+{source: "Oregon"               , target: "Washington State"      , type: "resolved"},
+{source: "South Alabama"        , target: "Kent State"            , type: "resolved"},
+{source: "Stanford"             , target: "UCLA"                  , type: "resolved"},
+{source: "Texas A&M"            , target: "Auburn"                , type: "resolved"},
+{source: "Texas State"          , target: "Georgia State"         , type: "resolved"},
+{source: "Toledo"               , target: "Navy"                  , type: "resolved"},
+{source: "Virginia"             , target: "Duke"                  , type: "resolved"},
+{source: "Wyoming"              , target: "Colorado State"        , type: "resolved"},
+{source: "Mississippi State"    , target: "Kentucky"              , type: "resolved"},
+{source: "BYU"                  , target: "Boise State"           , type: "resolved"},
+{source: "Alabama"              , target: "Tennessee"             , type: "resolved"},
+{source: "Auburn"               , target: "Florida Atlantic"      , type: "resolved"},
+{source: "Bowling Green"        , target: "Toledo"                , type: "resolved"},
+{source: "Florida State"        , target: "North Carolina State"  , type: "resolved"},
+{source: "Iowa"                 , target: "Northwestern"          , type: "resolved"},
+{source: "Kansas State"         , target: "West Virginia"         , type: "resolved"},
+{source: "Massachusetts"        , target: "Western Michigan"      , type: "resolved"},
+{source: "Miami (Florida)"      , target: "Wake Forest"           , type: "resolved"},
+{source: "Mississippi"          , target: "Idaho"                 , type: "resolved"},
+{source: "Missouri"             , target: "South Carolina"        , type: "resolved"},
+{source: "Nevada"               , target: "UNLV"                  , type: "resolved"},
+{source: "North Carolina"       , target: "Boston College"        , type: "resolved"},
+{source: "Northern Illinois"    , target: "Eastern Michigan"      , type: "resolved"},
+{source: "Ohio"                 , target: "Miami (Ohio)"          , type: "resolved"},
+{source: "Ohio State"           , target: "Penn State"            , type: "resolved"},
+{source: "Oklahoma"             , target: "Texas Tech"            , type: "resolved"},
+{source: "Oregon"               , target: "UCLA"                  , type: "resolved"},
+{source: "Rice"                 , target: "UTEP"                  , type: "resolved"},
+{source: "Rutgers"              , target: "Houston"               , type: "resolved"},
+{source: "SMU"                  , target: "Temple"                , type: "resolved"},
+{source: "San Jose State"       , target: "Wyoming"               , type: "resolved"},
+{source: "USC"                  , target: "Utah"                  , type: "resolved"},
+{source: "Texas A&M"            , target: "Vanderbilt"            , type: "resolved"},
+{source: "TCU"                  , target: "Texas"                 , type: "resolved"},
+{source: "UTSA"                 , target: "UAB"                   , type: "resolved"},
+{source: "UCF"                  , target: "Connecticut"           , type: "resolved"},
+{source: "Louisiana-Monroe"     , target: "Georgia State"         , type: "resolved"},
+{source: "Virginia Tech"        , target: "Duke"                  , type: "resolved"},
+{source: "Washington"           , target: "California"            , type: "resolved"},
+{source: "Western Kentucky"     , target: "Troy"                  , type: "resolved"},
+{source: "Houston"              , target: "South Florida"         , type: "resolved"},
+{source: "North Texas"          , target: "Rice"                  , type: "resolved"},
+{source: "Troy"                 , target: "Louisiana-Monroe"      , type: "resolved"},
+{source: "Oregon State"         , target: "USC"                   , type: "resolved"},
+{source: "Air Force"            , target: "Army"                  , type: "resolved"},
+{source: "Akron"                , target: "Kent State"            , type: "resolved"},
+{source: "Florida Atlantic"     , target: "Tulane"                , type: "resolved"},
+{source: "Florida State"        , target: "Miami (Florida)"       , type: "resolved"},
+{source: "Fresno State"         , target: "Nevada"                , type: "resolved"},
+{source: "Georgia Tech"         , target: "Pittsburgh"            , type: "resolved"},
+{source: "Indiana"              , target: "Minnesota"             , type: "resolved"},
+{source: "Kansas State"         , target: "Iowa State"            , type: "resolved"},
+{source: "Marshall"             , target: "Southern Mississippi"  , type: "resolved"},
+{source: "Michigan State"       , target: "Michigan"              , type: "resolved"},
+{source: "Missouri"             , target: "Tennessee"             , type: "resolved"},
+{source: "Nebraska"             , target: "Northwestern"          , type: "resolved"},
+{source: "Notre Dame"           , target: "Navy"                  , type: "resolved"},
+{source: "Penn State"           , target: "Illinois"              , type: "resolved"},
+{source: "Rutgers"              , target: "Temple"                , type: "resolved"},
+{source: "San Diego State"      , target: "New Mexico"            , type: "resolved"},
+{source: "South Alabama"        , target: "Arkansas State"        , type: "resolved"},
+{source: "South Carolina"       , target: "Mississippi State"     , type: "resolved"},
+{source: "Syracuse"             , target: "Wake Forest"           , type: "resolved"},
+{source: "Texas"                , target: "Kansas"                , type: "resolved"},
+{source: "Texas A&M"            , target: "UTEP"                  , type: "resolved"},
+{source: "TCU"                  , target: "West Virginia"         , type: "resolved"},
+{source: "Toledo"               , target: "Eastern Michigan"      , type: "resolved"},
+{source: "Tulsa"                , target: "UTSA"                  , type: "resolved"},
+{source: "UCLA"                 , target: "Colorado"              , type: "resolved"},
+{source: "Louisiana-Lafayette"  , target: "New Mexico State"      , type: "resolved"},
+{source: "Utah State"           , target: "Hawai'i"               , type: "resolved"},
+{source: "Buffalo"              , target: "Ohio"                  , type: "resolved"},
+{source: "Ball State"           , target: "Central Michigan"      , type: "resolved"},
+{source: "Baylor"               , target: "Oklahoma"              , type: "resolved"},
+{source: "Louisiana-Lafayette"  , target: "Troy"                  , type: "resolved"},
+{source: "New Mexico"           , target: "Air Force"             , type: "resolved"},
+{source: "Alabama"              , target: "LSU"                   , type: "resolved"},
+{source: "Arizona"              , target: "UCLA"                  , type: "resolved"},
+{source: "Cincinnati"           , target: "SMU"                   , type: "resolved"},
+{source: "Colorado State"       , target: "Nevada"                , type: "resolved"},
+{source: "Duke"                 , target: "North Carolina State"  , type: "resolved"},
+{source: "East Carolina"        , target: "Tulsa"                 , type: "resolved"},
+{source: "Florida"              , target: "Vanderbilt"            , type: "resolved"},
+{source: "Indiana"              , target: "Illinois"              , type: "resolved"},
+{source: "Louisiana Tech"       , target: "Southern Mississippi"  , type: "resolved"},
+{source: "Marshall"             , target: "UAB"                   , type: "resolved"},
+{source: "Maryland"             , target: "Syracuse"              , type: "resolved"},
+{source: "Miami (Florida)"      , target: "Virginia Tech"         , type: "resolved"},
+{source: "Michigan"             , target: "Nebraska"              , type: "resolved"},
+{source: "Middle Tennessee"     , target: "Florida International" , type: "resolved"},
+{source: "Minnesota"            , target: "Penn State"            , type: "resolved"},
+{source: "Mississippi"          , target: "Arkansas"              , type: "resolved"},
+{source: "Navy"                 , target: "Hawai'i"               , type: "resolved"},
+{source: "North Carolina"       , target: "Virginia"              , type: "resolved"},
+{source: "North Texas"          , target: "UTEP"                  , type: "resolved"},
+{source: "Oklahoma State"       , target: "Kansas"                , type: "resolved"},
+{source: "San Jose State"       , target: "San Diego State"       , type: "resolved"},
+{source: "Texas A&M"            , target: "Mississippi State"     , type: "resolved"},
+{source: "Texas Tech"           , target: "Kansas State"          , type: "resolved"},
+{source: "UTSA"                 , target: "Tulane"                , type: "resolved"},
+{source: "UCF"                  , target: "Houston"               , type: "resolved"},
+{source: "Louisiana-Monroe"     , target: "Arkansas State"        , type: "resolved"},
+{source: "Washington"           , target: "Colorado"              , type: "resolved"},
+{source: "Wisconsin"            , target: "BYU"                   , type: "resolved"},
+{source: "Bowling Green"        , target: "Ohio"                  , type: "resolved"},
+{source: "Toledo"               , target: "Buffalo"               , type: "resolved"},
+{source: "Kent State"           , target: "Miami (Ohio)"          , type: "resolved"},
+{source: "Northern Illinois"    , target: "Ball State"            , type: "resolved"},
+{source: "Clemson"              , target: "Georgia Tech"          , type: "resolved"},
+{source: "UCLA"                 , target: "Washington"            , type: "resolved"},
+{source: "Arizona"              , target: "Washington State"      , type: "resolved"},
+{source: "Arizona State"        , target: "Oregon State"          , type: "resolved"},
+{source: "Arkansas State"       , target: "Texas State"           , type: "resolved"},
+{source: "Auburn"               , target: "Georgia"               , type: "resolved"},
+{source: "Boise State"          , target: "Wyoming"               , type: "resolved"},
+{source: "Boston College"       , target: "North Carolina State"  , type: "resolved"},
+{source: "Colorado"             , target: "California"            , type: "resolved"},
+{source: "East Carolina"        , target: "UAB"                   , type: "resolved"},
+{source: "Florida State"        , target: "Syracuse"              , type: "resolved"},
+{source: "Kansas State"         , target: "TCU"                   , type: "resolved"},
+{source: "Louisville"           , target: "Houston"               , type: "resolved"},
+{source: "Mississippi"          , target: "Troy"                  , type: "resolved"},
+{source: "Navy"                 , target: "South Alabama"         , type: "resolved"},
+{source: "Northwestern"         , target: "Michigan"              , type: "resolved"},
+{source: "Oklahoma"             , target: "Iowa State"            , type: "resolved"},
+{source: "Oregon"               , target: "Utah"                  , type: "resolved"},
+{source: "Penn State"           , target: "Purdue"                , type: "resolved"},
+{source: "Pittsburgh"           , target: "North Carolina"        , type: "resolved"},
+{source: "Rice"                 , target: "Louisiana Tech"        , type: "resolved"},
+{source: "SMU"                  , target: "Connecticut"           , type: "resolved"},
+{source: "South Carolina"       , target: "Florida"               , type: "resolved"},
+{source: "UTEP"                 , target: "Florida International" , type: "resolved"},
+{source: "Vanderbilt"           , target: "Kentucky"              , type: "resolved"},
+{source: "Virginia Tech"        , target: "Maryland"              , type: "resolved"},
+{source: "Wisconsin"            , target: "Indiana"               , type: "resolved"},
+{source: "Ohio"                 , target: "Kent State"            , type: "resolved"},
+{source: "Air Force"            , target: "UNLV"                  , type: "resolved"},
+{source: "UCF"                  , target: "Rutgers"               , type: "resolved"},
+{source: "San Jose State"       , target: "Navy"                  , type: "resolved"},
+{source: "Arkansas State"       , target: "Georgia State"         , type: "resolved"},
+{source: "Central Michigan"     , target: "Massachusetts"         , type: "resolved"},
+{source: "Florida Atlantic"     , target: "New Mexico State"      , type: "resolved"},
+{source: "Florida State"        , target: "Idaho"                 , type: "resolved"},
+{source: "Fresno State"         , target: "New Mexico"            , type: "resolved"},
+{source: "Georgia"              , target: "Kentucky"              , type: "resolved"},
+{source: "Houston"              , target: "Cincinnati"            , type: "resolved"},
+{source: "Iowa"                 , target: "Michigan"              , type: "resolved"},
+{source: "Iowa State"           , target: "Kansas"                , type: "resolved"},
+{source: "Kansas State"         , target: "Oklahoma"              , type: "resolved"},
+{source: "LSU"                  , target: "Texas A&M"             , type: "resolved"},
+{source: "Louisville"           , target: "Memphis"               , type: "resolved"},
+{source: "Miami (Florida)"      , target: "Virginia"              , type: "resolved"},
+{source: "North Texas"          , target: "UTSA"                  , type: "resolved"},
+{source: "Notre Dame"           , target: "BYU"                   , type: "resolved"},
+{source: "Ohio State"           , target: "Indiana"               , type: "resolved"},
+{source: "Oregon State"         , target: "Washington"            , type: "resolved"},
+{source: "Penn State"           , target: "Nebraska"              , type: "resolved"},
+{source: "South Alabama"        , target: "Louisiana-Monroe"      , type: "resolved"},
+{source: "Stanford"             , target: "California"            , type: "resolved"},
+{source: "Temple"               , target: "Connecticut"           , type: "resolved"},
+{source: "Tennessee"            , target: "Vanderbilt"            , type: "resolved"},
+{source: "Tulane"               , target: "UTEP"                  , type: "resolved"},
+{source: "Utah State"           , target: "Colorado State"        , type: "resolved"},
+{source: "Washington State"     , target: "Utah"                  , type: "resolved"},
+{source: "Wyoming"              , target: "Hawai'i"               , type: "resolved"}
+
+  // {source: "Microsoft", target: "Amazon", type: "licensing"},
+  // {source: "Microsoft", target: "HTC", type: "licensing"},
+  // {source: "Samsung", target: "Apple", type: "suit"},
+  // {source: "Motorola", target: "Apple", type: "suit"},
+  // {source: "Nokia", target: "Apple", type: "resolved"},
+  // {source: "HTC", target: "Apple", type: "suit"},
+  // {source: "Kodak", target: "Apple", type: "suit"},
+  // {source: "Microsoft", target: "Barnes & Noble", type: "suit"},
+  // {source: "Microsoft", target: "Foxconn", type: "suit"},
+  // {source: "Oracle", target: "Google", type: "suit"},
+  // {source: "Apple", target: "HTC", type: "suit"},
+  // {source: "Microsoft", target: "Inventec", type: "suit"},
+  // {source: "Samsung", target: "Kodak", type: "resolved"},
+  // {source: "LG", target: "Kodak", type: "resolved"},
+  // {source: "RIM", target: "Kodak", type: "suit"},
+  // {source: "Sony", target: "LG", type: "suit"},
+  // {source: "Kodak", target: "LG", type: "resolved"},
+  // {source: "Apple", target: "Nokia", type: "resolved"},
+  // {source: "Qualcomm", target: "Nokia", type: "resolved"},
+  // {source: "Apple", target: "Motorola", type: "suit"},
+  // {source: "Microsoft", target: "Motorola", type: "suit"},
+  // {source: "Motorola", target: "Microsoft", type: "suit"},
+  // {source: "Huawei", target: "ZTE", type: "suit"},
+  // {source: "Ericsson", target: "ZTE", type: "suit"},
+  // {source: "Kodak", target: "Samsung", type: "resolved"},
+  // {source: "Apple", target: "Samsung", type: "suit"},
+  // {source: "Kodak", target: "RIM", type: "suit"},
+  // {source: "Nokia", target: "Qualcomm", type: "suit"}
+];
+
+var nodes = {};
+
+// Compute the distinct nodes from the links.
+links.forEach(function(link) {
+  link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+  link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+});
+
+var width = 1080,
+    height = 960;
+
+var force = d3.layout.force()
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([width, height])
+    .linkDistance(30)
+    .charge(-300)
+    .on("tick", tick)
+    .start();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// Per-type markers, as they don't inherit styles.
+svg.append("defs").selectAll("marker")
+    .data(["suit", "licensing", "resolved"])
+  .enter().append("marker")
+    .attr("id", function(d) { return d; })
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 15)
+    .attr("refY", -1.5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+  .append("path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+var path = svg.append("g").selectAll("path")
+    .data(force.links())
+  .enter().append("path")
+    .attr("class", function(d) { return "link " + d.type; })
+    // .attr("marker-end", function(d) { return "url(#" + d.type + ")"; })
+    ;
+
+var circle = svg.append("g").selectAll("circle")
+    .data(force.nodes())
+  .enter().append("circle")
+    .attr("r", 6)
+    .call(force.drag);
+
+var text = svg.append("g").selectAll("text")
+    .data(force.nodes())
+  .enter().append("text")
+    .attr("x", 8)
+    .attr("y", ".31em")
+    .text(function(d) { return d.name; });
+
+// Use elliptical arc path segments to doubly-encode directionality.
+function tick() {
+  path.attr("d", linkArc);
+  circle.attr("transform", transform);
+  text.attr("transform", transform);
+}
+
+function linkArc(d) {
+  var dx = d.target.x - d.source.x,
+      dy = d.target.y - d.source.y,
+      dr = Math.sqrt(dx * dx + dy * dy);
+  return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+}
+
+function transform(d) {
+  return "translate(" + d.x + "," + d.y + ")";
+}
+
+</script>
