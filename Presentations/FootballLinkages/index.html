@@ -2,7 +2,20 @@
 <meta charset="utf-8">
 <style>
 
-body {background-color:#fff;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { 
+    margin:0;
+    padding:0;
+}
+html,body {
+    margin:0;
+    padding:0;
+}
+
+body {background-color:#000;}
+
+border {
+    stroke: #666;
+}
 
 .link {
   fill: none;
@@ -37,9 +50,9 @@ circle {
 
 text {
   font: 9px sans-serif;
-  color: aqua;
+  fill: white;
   pointer-events: none;
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000;
 }
 
 </style>
@@ -537,35 +550,6 @@ var links = [
 {source: "Utah State"           , target: "Colorado State"        , type: "resolved"},
 {source: "Washington State"     , target: "Utah"                  , type: "resolved"},
 {source: "Wyoming"              , target: "Hawai'i"               , type: "resolved"}
-
-  // {source: "Microsoft", target: "Amazon", type: "licensing"},
-  // {source: "Microsoft", target: "HTC", type: "licensing"},
-  // {source: "Samsung", target: "Apple", type: "suit"},
-  // {source: "Motorola", target: "Apple", type: "suit"},
-  // {source: "Nokia", target: "Apple", type: "resolved"},
-  // {source: "HTC", target: "Apple", type: "suit"},
-  // {source: "Kodak", target: "Apple", type: "suit"},
-  // {source: "Microsoft", target: "Barnes & Noble", type: "suit"},
-  // {source: "Microsoft", target: "Foxconn", type: "suit"},
-  // {source: "Oracle", target: "Google", type: "suit"},
-  // {source: "Apple", target: "HTC", type: "suit"},
-  // {source: "Microsoft", target: "Inventec", type: "suit"},
-  // {source: "Samsung", target: "Kodak", type: "resolved"},
-  // {source: "LG", target: "Kodak", type: "resolved"},
-  // {source: "RIM", target: "Kodak", type: "suit"},
-  // {source: "Sony", target: "LG", type: "suit"},
-  // {source: "Kodak", target: "LG", type: "resolved"},
-  // {source: "Apple", target: "Nokia", type: "resolved"},
-  // {source: "Qualcomm", target: "Nokia", type: "resolved"},
-  // {source: "Apple", target: "Motorola", type: "suit"},
-  // {source: "Microsoft", target: "Motorola", type: "suit"},
-  // {source: "Motorola", target: "Microsoft", type: "suit"},
-  // {source: "Huawei", target: "ZTE", type: "suit"},
-  // {source: "Ericsson", target: "ZTE", type: "suit"},
-  // {source: "Kodak", target: "Samsung", type: "resolved"},
-  // {source: "Apple", target: "Samsung", type: "suit"},
-  // {source: "Kodak", target: "RIM", type: "suit"},
-  // {source: "Nokia", target: "Qualcomm", type: "suit"}
 ];
 
 var nodes = {};
@@ -576,15 +560,15 @@ links.forEach(function(link) {
   link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
 });
 
-var width = 1080,
-    height = 960;
+var width = 720,
+    height = 580;
 
 var force = d3.layout.force()
     .nodes(d3.values(nodes))
     .links(links)
     .size([width, height])
-    .linkDistance(30)
-    .charge(-300)
+    .linkDistance(20)
+    .charge(-150)
     .on("tick", tick)
     .start();
 
